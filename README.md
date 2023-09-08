@@ -1,94 +1,90 @@
-# LinuxKit
+LinuxKit [![CircleCI](https://circleci.com/gh/linuxkit/linuxkit.svg?style=svg)](https://circleci.com/gh/linuxkit/linuxkit)LinuxKit, a toolkit for building custom minimal, immutable Linux distributions.
+Secure defaults without compromising usability Everything is replaceable and customisable Immutable infrastructure applied to building Linux distributions
+ Completely stateless
+ but persistent storage can be attached
+Easy tooling, with easy iteration
+Built with containers, for running containers Designed to create [reproducible builds](./docs/reproducible-builds.md) 
+[WIP] Designed for building and running clustered applications, including but not limited to container orchestration such as Docker or Kubernetes
+Designed from the experience of building Docker Editions, but redesigned as a general-purpose toolkit
+ Designed to be managed by external tooling, such as
+ [Infrakit](https://github.com/docker/infrakit) (renamed to 
+ [deploykit](https://github.com/docker/deploykit) which has been archived in 2019) or similar tools Includes a set of longer-term collaborative projects in various stages of development to innovate on kernel and userspace changes, particularly around security
+LinuxKit currently supports the `x86_64`, `arm64`, and `s390x` architectures on a variety of platforms, both as virtual machines and baremetal
+(see [below](#booting-and-testing)
+for details)  Subprojects
+[LinuxKit kubernetes](https://github.com/linuxkit/kubernetes) aims to build minimal 
+and immutable Kubernetes images. (previously `projects/kubernetes` in
+this repository)
 
-[![CircleCI](https://circleci.com/gh/linuxkit/linuxkit.svg?style=svg)](https://circleci.com/gh/linuxkit/linuxkit)
+ [LinuxKit LCOW](https://github.com/linuxkit/lcow) LinuxKit images and utilities for Microsoft's Linux Containers on Windows.
 
-LinuxKit, a toolkit for building custom minimal, immutable Linux distributions.
+ [linux](https://github.com/linuxkit/linux) A copy of the Linux stable tree with branches LinuxKit kernels.
+[virtsock](https://github.com/linuxkit/virtsock) A `go` library and test utilities for `virtio` and Hyper-V sockets
+ [rtf](https://github.com/linuxkit/rtf) A regression test framework used for the LinuxKit CI tests and other projects
 
-- Secure defaults without compromising usability
-- Everything is replaceable and customisable
-- Immutable infrastructure applied to building Linux distributions
-- Completely stateless, but persistent storage can be attached
-- Easy tooling, with easy iteration
-- Built with containers, for running containers
-- Designed to create [reproducible builds](./docs/reproducible-builds.md) [WIP]
-- Designed for building and running clustered applications, including but not limited to container orchestration such as Docker or Kubernetes
-- Designed from the experience of building Docker Editions, but redesigned as a general-purpose toolkit
-- Designed to be managed by external tooling, such as [Infrakit](https://github.com/docker/infrakit) (renamed to [deploykit](https://github.com/docker/deploykit) which has been archived in 2019) or similar tools
-- Includes a set of longer-term collaborative projects in various stages of development to innovate on kernel and userspace changes, particularly around security
-
-LinuxKit currently supports the `x86_64`, `arm64`, and `s390x` architectures on a variety of platforms, both as virtual machines and baremetal (see [below](#booting-and-testing) for details).
-
-## Subprojects
-
-- [LinuxKit kubernetes](https://github.com/linuxkit/kubernetes) aims to build minimal and immutable Kubernetes images. (previously `projects/kubernetes` in this repository).
-- [LinuxKit LCOW](https://github.com/linuxkit/lcow) LinuxKit images and utilities for Microsoft's Linux Containers on Windows.
-- [linux](https://github.com/linuxkit/linux) A copy of the Linux stable tree with branches LinuxKit kernels.
-- [virtsock](https://github.com/linuxkit/virtsock) A `go` library and test utilities for `virtio` and Hyper-V sockets.
-- [rtf](https://github.com/linuxkit/rtf) A regression test framework used for the LinuxKit CI tests (and other projects).
-- [homebrew](https://github.com/linuxkit/homebrew-linuxkit) Homebrew packages for the `linuxkit` tool.
-
-## Getting Started
-
-### Build the `linuxkit` tool
-
+ [homebrew](https://github.com/linuxkit/homebrew-linuxkit) Homebrew packages for the `linuxkit` tool
+ Getting Started Build the `linuxkit` tool
 LinuxKit uses the `linuxkit` tool for building, pushing and running VM images.
-
 Simple build instructions: use `make` to build. This will build the tool in `bin/`. Add this
 to your `PATH` or copy it to somewhere in your `PATH` eg `sudo cp bin/* /usr/local/bin/`. Or you can use `sudo make install`.
-
-If you already have `go` installed you can use `go install github.com/linuxkit/linuxkit/src/cmd/linuxkit@latest` to install the `linuxkit` tool.
-
-On MacOS there is a `brew tap` available. Detailed instructions are at [linuxkit/homebrew-linuxkit](https://github.com/linuxkit/homebrew-linuxkit),
+If you already have `go` installed you can use `go install github.com/linuxkit/linuxkit/src/cmd/linuxkit@latest` to install the `linuxkit` tool
+On MacOS there is a `brew tap` available Detailed instructions are at [linuxkit/homebrew-linuxkit](https://github.com/linuxkit/homebrew-linuxkit)
 the short summary is
 ```
 brew tap linuxkit/linuxkit
 brew install --HEAD linuxkit
 ```
-
 Build requirements from source using a container
-- GNU `make`
-- Docker
-- optionally `qemu`
-
+ GNU `make`
+ Docker
+ optionally `qemu`
 For a local build using `make local`
 - `go`
 - `make`
 - `go get -u golang.org/x/lint/golint`
 - `go get -u github.com/gordonklaus/ineffassign`
 
-### Building images
-
-Once you have built the tool, use
-
+Building images Once you have built the tool
+use
 ```
 linuxkit build linuxkit.yml
 ```
-to build the example configuration. You can also specify different output formats, eg `linuxkit build -format raw-bios linuxkit.yml` to
-output a raw BIOS bootable disk image, or `linuxkit build -format iso-efi linuxkit.yml` to output an EFI bootable ISO image. See `linuxkit build -help` for more information.
-
-### Booting and Testing
-
+to build the example configuration
+You can also specify different output formats, eg `linuxkit build -format raw-bios linuxkit.yml` to
+output a raw BIOS bootable disk image, or `linuxkit build -format iso-efi linuxkit.yml` to output an EFI bootable ISO image. See `linuxkit build -help` for more information Booting and Testing
 You can use `linuxkit run <name>` or `linuxkit run <name>.<format>` to
 execute the image you created with `linuxkit build <name>.yml`.  This
 will use a suitable backend for your platform or you can choose one,
 for example VMWare.  See `linuxkit run --help`.
-
 Currently supported platforms are:
-- Local hypervisors
-  - [Virtualization.Framework (macOS)](docs/platform-virtualization-framework.md) `[x86_64, arm64]`
-  - [HyperKit (macOS)](docs/platform-hyperkit.md) `[x86_64]`
-  - [Hyper-V (Windows)](docs/platform-hyperv.md) `[x86_64]`
-  - [qemu (macOS, Linux, Windows)](docs/platform-qemu.md) `[x86_64, arm64, s390x]`
-  - [VMware (macOS, Windows)](docs/platform-vmware.md) `[x86_64]`
-- Cloud based platforms:
-  - [Amazon Web Services](docs/platform-aws.md) `[x86_64]`
-  - [Google Cloud](docs/platform-gcp.md) `[x86_64]`
-  - [Microsoft Azure](docs/platform-azure.md) `[x86_64]`
-  - [OpenStack](docs/platform-openstack.md) `[x86_64]`
-  - [Scaleway](docs/platform-scaleway.md) `[x86_64]`
+Local hypervisors
+
+[Virtualization.Framework (macOS)](docs/platform-virtualization-framework.md) `[x86_64, arm64]`
+
+ [HyperKit (macOS)](docs/platform-hyperkit.md) `[x86_64]`
+
+[Hyper-V (Windows)](docs/platform-hyperv.md) `[x86_64]`
+
+[qemu (macOS, Linux, Windows)](docs/platform-qemu.md) `[x86_64, arm64, s390x]`
+
+[VMware (macOS, Windows)](docs/platform-vmware.md) `[x86_64]`
+
+Cloud based platforms:
+[Amazon Web Services](docs/platform-aws.md) `[x86_64]`
+
+ [Google Cloud](docs/platform-gcp.md) `[x86_64]`
+
+ [Microsoft Azure](docs/platform-azure.md) `[x86_64]`
+
+[OpenStack](docs/platform-openstack.md) `[x86_64]`
+  
+  [Scaleway](docs/platform-scaleway.md) `[x86_64]`
 - Baremetal:
-  - [packet.net](docs/platform-packet.md) `[x86_64, arm64]`
-  - [Raspberry Pi Model 3b](docs/platform-rpi3.md)  `[arm64]`
+
+
+ [packet.net](docs/platform-packet.md) `[x86_64, arm64]`
+
+ [Raspberry Pi Model 3b](docs/platform-rpi3.md)  `[arm64]`
 
 
 #### Running the Tests
